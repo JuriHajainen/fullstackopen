@@ -1,2 +1,1 @@
-## Juri Hajainen
-# FULLSTACKOPEN: Palautusrepositorio
+### Osa 0
