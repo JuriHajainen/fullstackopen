@@ -12,6 +12,16 @@ const Button = (props) => <button onClick={ props.onClick }>{ props.text }</butt
 //--- ------------------------------------------------
 //--- ------------------------------------------------
 const Statistics = (props) => {
+
+  if (props.good === 0 && props.neutral === 0 && props.bad === 0) {
+    return (
+      <div>
+        <h2>Statistics</h2>
+        <div>No feedback given</div>
+      </div>
+    )
+  }
+
   return (
   <div>
     <h2>Statistics</h2>
@@ -23,6 +33,7 @@ const Statistics = (props) => {
     <div>Positive: { props.goodInPercentage } %</div>
   </div>
   )
+
 }
 
 //--- ------------------------------------------------
