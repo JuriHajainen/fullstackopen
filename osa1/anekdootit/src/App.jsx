@@ -3,10 +3,43 @@
 import { useState/*, useEffect*/ } from 'react'
 
 
+
+//--- ------------------------------------------------
+//--- ------------------------------------------------
+const AnecdoteView = (props) => {
+
+  return (
+    <>
+      <div>{ props.anecdote }</div>
+      <div>Has { props.vote } vote{ (props.vote > 1) ? 's': '' }</div>
+    </>
+  )
+
+}
+
+//--- ------------------------------------------------
+//--- ------------------------------------------------
+const AnecdoteTopVotes = (props) => {
+
+  return (
+  <div>
+    <h2>Anecdote with most votes</h2>
+    {
+      (props.anecdoteTopVotes_votes < 1) ?
+        (<div>No votes given yet</div>)
+      :
+        (<AnecdoteView anecdote = { props.anecdoteTopVotes } vote = { props.anecdoteTopVotes_votes }></AnecdoteView>)
+    }
+  </div>
+  )
+
+}
+
 //--- ------------------------------------------------
 //--- ------------------------------------------------
 const App = () => {
 
+  
   const anecdotes = [
     'If it hurts, do it more often.',
     'Adding manpower to a late software project makes it later!',
@@ -17,19 +50,58 @@ const App = () => {
     'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when dianosing patients.',
     'The only way to go fast, is to go well.'
   ]
-  const [selected, setSelected] = useState(0)
+  // console.log('anecdotes.lenght (default): ', anecdotes.length);
 
-  //--- METHODs ---------------------------------------
-  const anecdote_setRandom = () => {
-    setSelected( Math.floor(Math.random() * anecdotes.length) )
+  //--- Set random number ----------------
+  const num_setRandom = () => { // (!) Before using useEffect (!)
+    return Math.floor(Math.random() * anecdotes.length)
+    // console.log('works');
   }
 
+  const [ votes, setVotes ] = useState( Array(anecdotes.length).fill(0) )
+  const [ selected, setSelected ] = useState( num_setRandom() )
+  const [ votesTop, setVotesTop ] = useState( 0 )
+  // console.log('selected (default): ', selected);
+
+
+  //--- METHODs ---------------------------------------
+  
+  //--- Set random anecdote ----------------
+  const anecdote_setRandom = () => {
+    setSelected(num_setRandom())
+    // console.log('selected: ', selected);
+  }
+
+  //--- Vote for current anecdote ----------
+  const anecdote_vote = () => {
+    let this_votes = [...votes]
+    this_votes[selected]++
+    setVotes(this_votes)
+    console.log('anecdote_vote => votes: ', votes);
+    // console.log('anecdote_vote => Selected: ', selected);
+    console.log('anecdote_vote => Vote current: ', votes[selected]);
+    votesTop_set(this_votes)
+  }
+
+  //--- VotesTop: set index of the anecdote with most votes --------
+  const votesTop_set = (this_votes) => {
+    setVotesTop(
+      this_votes.reduce(
+        (indexMax, vote, indexCurrent, arr) => (vote > arr[indexMax]) ? indexCurrent : indexMax, 0
+      )
+    )
+    // console.log('votesTop: ', votesTop);
+  }
+  
 
   //----------------------------------------
   return (
     <>
+      <h2>Anecdote of the day</h2>
+      <button onClick = { anecdote_vote }>Vote</button>
       <button onClick = { anecdote_setRandom }>Next anecdote</button>
-      <div>{ anecdotes[selected] }</div>
+      <AnecdoteView anecdote = { anecdotes[selected] } vote = { votes[selected] }></AnecdoteView>
+      <AnecdoteTopVotes anecdoteTopVotes = { anecdotes[votesTop] } anecdoteTopVotes_votes = { votes[votesTop] }></AnecdoteTopVotes>
     </>
   )
 }
