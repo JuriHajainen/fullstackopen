@@ -5,11 +5,11 @@ import Note from './components/Note'
 
 //--- NOTE ------------------------------------------------
 
-const Note = ({ note }) => {
-  return (
-    <li>{ note.content }</li>
-  )
-}
+// const Note = ({ note }) => {
+//   return (
+//     <li>{ note.content }</li>
+//   )
+// }
 
 
 //--- APP ------------------------------------------------
