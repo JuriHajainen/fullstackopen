@@ -1,6 +1,6 @@
-// import { useState } from 'react'
 // import './App.css'
-import Note from './components/Note'
+import { useState } from 'react'
+import Note         from './components/Note'
 
 
 //--- NOTE ------------------------------------------------
@@ -14,17 +14,56 @@ import Note from './components/Note'
 
 //--- APP ------------------------------------------------
 
-const App = ({ notes }) => {
+const App = (props) => {
 
-  // const { notes } = props
-  console.log( notes.map( note => note.content ) )
+  const [ notes, setNotes ]     = useState(props.notes)
+  const [ newNote, setNewNote ] = useState('A new note...')
+  const [ showAll, setShowAll ] = useState(true)
 
+  // console.log( notes.map( note => note.content ) )
+
+  const addNote = (ev) => {
+    ev.preventDefault()
+    // console.log('Button clicked', ev.target)
+    const noteObj = {
+      content: newNote,
+      important: Math.random() > 0.5,
+      id: String(notes.length + 1)
+    }
+    setNotes(notes.concat(noteObj))
+    setNewNote('')
+  }
+
+  const handleNoteChange = (ev) => {
+    console.log(ev.target.value)
+    setNewNote(ev.target.value)
+  }
+
+  const notesToShow = showAll ? notes : notes.filter( note => note.important )
+
+
+  //--- ------------------------------------
   return (
     <div>
+
       <h1>Notes</h1>
-      <ul>{ notes.map( note => <Note key = { note.id } note = { note } /> ) }</ul>
+
+      <div>
+        <button onClick = { () => setShowAll(!showAll) }>Show { showAll ? 'important' : 'all' }</button>
+      </div>
+
+      <ul>{ notesToShow.map( note => <Note key = { note.id } note = { note } /> ) }</ul>
+
+      <form onSubmit={ addNote }>
+        <input type     = "text"
+               value    = { newNote }
+               onChange = { handleNoteChange }/>
+        <button type="submit">add</button>
+      </form>
+
     </div>
   )
+
 
 }
 
