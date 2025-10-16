@@ -8,10 +8,12 @@ import Person       from './components/Person'
 const App = (props) => {
 
 
-  const [ persons, setPersons ]     = useState(props.persons)
-  const [ newName, setNewName ]     = useState('')
-  const [ newNumber, setNewNumber ] = useState('')
-  const [ id, setId ]               = useState(2) // SET "id" to use it for new added persons
+  const [ persons, setPersons ]                = useState(props.persons)
+  const [ newName, setNewName ]                = useState('')
+  const [ newNumber, setNewNumber ]            = useState('')
+  const [ id, setId ]                          = useState(7) // SET "id" to use it for new added persons
+  const [ search_keyword, search_keyword_set ] = useState('')
+  // const [ search_results, search_results_set ] = useState([])
 
   const number_validationRules_text = `Number is not valid.
   RULES:
@@ -116,6 +118,20 @@ const App = (props) => {
     console.log(ev.target.value)
     setNewNumber(ev.target.value)
   }
+
+  //--- ----------------------------------------
+  const search_keyword_onChange = (ev) => {
+    console.log(ev.target.value)
+    search_keyword_set(ev.target.value)
+    console.log('search_keyword', search_keyword)
+    // const re = new RegExp(search_keyword, 'i')
+    // search_results_set(persons.filter(person => person.name.match(re)))
+    // console.log('search_results', search_results)
+    
+  }
+  
+  const re             = new RegExp(search_keyword, 'i')
+  const search_results = (search_keyword) ? persons.filter( person => re.test(person.name) ) : []
   
   
   //--- ----------------------------------------
@@ -145,32 +161,46 @@ const App = (props) => {
   return (
     <div>
 
-      <h2>Phonebook</h2>
+      <h1>Phonebook</h1>
 
+      <hr />
+
+      <h2>Search</h2>
+      <div>
+          Filter shown with: <input type     = "text"
+                                    value    = { search_keyword }
+                                    onChange = { search_keyword_onChange }/>
+      </div>
+      <h4>Results</h4>
+      <ul>{
+        (search_results.length === 0) ?
+        'No results' :
+        search_results.map( result => <Person key = { result.id } person = { result } /> )
+      }</ul>
+      
+      <hr />
+
+      <h2>Add new</h2>
       <form onSubmit={ addName }>
-
         <div>
           <span title="Pakollinen kenttä">Name*: </span>
           <input type        = "text"
                  placeholder = 'A new name...'
                  value       = { newName }
                  onChange    = { handleNewName }/>
-        </div>
-        
+        </div>      
         <div>
           Number: <input type       = "text"
                          placeholder = '... and number if needed'
                          value       = { newNumber }
                          onChange    = { handleNewNumber }/>
         </div>
-        
         <div><button type="submit">Add</button></div>
-
       </form>
 
       {/* <div>_DEV_DEBUG: { newName }</div> */}
 
-      <h2>Numbers</h2>
+      <h4>All numbers</h4>
       <ul>{ persons.map( person => <Person key = { person.id } person = { person } /> ) }</ul>
 
     </div>
