@@ -131,7 +131,7 @@ const App = (props) => {
   }
   
   const re             = new RegExp(search_keyword, 'i')
-  const search_results = (search_keyword) ? persons.filter( person => re.test(person.name) ) : []
+  const search_results = persons.filter( person => re.test(person.name) ) // (search_keyword) ? persons.filter( person => re.test(person.name) ) : []
   
   
   //--- ----------------------------------------
@@ -171,12 +171,12 @@ const App = (props) => {
                                     value    = { search_keyword }
                                     onChange = { search_keyword_onChange }/>
       </div>
-      <h4>Results</h4>
+      {/* <h4>Results</h4>
       <ul>{
         (search_results.length === 0) ?
         'No results' :
         search_results.map( result => <Person key = { result.id } person = { result } /> )
-      }</ul>
+      }</ul> */}
       
       <hr />
 
@@ -200,8 +200,13 @@ const App = (props) => {
 
       {/* <div>_DEV_DEBUG: { newName }</div> */}
 
-      <h4>All numbers</h4>
-      <ul>{ persons.map( person => <Person key = { person.id } person = { person } /> ) }</ul>
+      <h4>{(search_keyword) ? 'Search results' : 'All numbers' }</h4>
+      <ul>{
+        (search_results.length === 0) ?
+        'No results' :
+        search_results.map( result => <Person key = { result.id } person = { result } /> )
+      }</ul>
+      {/* <ul>{ persons.map( person => <Person key = { person.id } person = { person } /> ) }</ul> */}
 
     </div>
   )
