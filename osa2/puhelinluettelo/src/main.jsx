@@ -8,8 +8,9 @@ import App from './App'
 
 const persons = [
   {
-    name: 'Arto Hellas',
-    id: 1
+    name:   'Arto Hellas',
+    number: '555-55555',
+    id:     1
   }
 ]
 

@@ -8,9 +8,21 @@ import Person       from './components/Person'
 const App = (props) => {
 
 
-  const [ persons, setPersons ] = useState(props.persons)
-  const [ newName, setNewName ] = useState('')
-  const [ id, setId ]           = useState(2) // SET "id" to use it for new added persons
+  const [ persons, setPersons ]     = useState(props.persons)
+  const [ newName, setNewName ]     = useState('')
+  const [ newNumber, setNewNumber ] = useState('')
+  const [ id, setId ]               = useState(2) // SET "id" to use it for new added persons
+
+  const number_validationRules_text = `Number is not valid.
+  RULES:
+  • 5-20 numbers
+  • " ", "(", ")", "-" are allowed
+  • Starts from 0-9 or "+"
+  • Ends at 0-9 only
+  • Any mount of " " at the start and the end will be removed by "trim"
+  • Doubled "(", ")", "-" are below
+  `
+
   // console.log('id:', id)
   // const [ showAll, setShowAll ] = useState(true)
   // console.log( notes.map( note => note.content ) )
@@ -21,26 +33,48 @@ const App = (props) => {
 
     ev.preventDefault()
 
-    if (newName_isEmpty(newName)) { // Is empty?
+    if (newName_isEmpty(newName)) { // Is "newName" empty?
       alert('Name field is empty')
-      newName_reset() // RESET it
     }
     else {
-      if (newName_isAlreadyAdded(newName)) {
+      if (newName_isAlreadyAdded(newName)) { // Is "newName" already added?
         alert(`${newName.trim()} is already added to phonebook`)
       }
       else {
-        // console.log('id from addName: before setId', id)
-        setId(id + 1)
-        // console.log('id from addName: after setId', id)
-        const personNew = {
-          name: newName.trim(),
-          id: id
-        }    
-        setPersons(persons.concat(personNew))
-        newName_reset() // RESET it
+        if (newNumber.trim()) { // If "newNumber" is not empty
+          // console.log('newNumber_isValid(newNumber)', newNumber_isValid(newNumber))
+          if (newNumber_isValid(newNumber)) { // Is phone number a valid
+            submit_main()
+          }
+          else { // If is not
+            alert(number_validationRules_text)
+          }
+        }
+        else { // if "Number" is empty
+          submit_main()
+        }
       }
     }
+    
+  }
+  
+  
+  //--- ----------------------------------------
+  const submit_main = () => {
+
+    // console.log('id from addName: before setId', id)
+     setId(id + 1)
+    // console.log('id from addName: after setId', id)
+
+    const personNew = {
+     name:   newName.trim(),
+     number: ( newNumber.trim() ) ? newNumber.trim() : '-- no number --',
+     id:     id
+    }
+
+    setPersons(persons.concat(personNew))
+    newName_reset() // RESET it
+    newNumber_reset() // RESET it
 
   }
 
@@ -51,13 +85,13 @@ const App = (props) => {
     setNewName(ev.target.value)
   }
 
-
+  
   //--- ----------------------------------------
   const newName_reset = () => {
     setNewName('') // RESET it
   }
 
-
+    
   //--- ----------------------------------------
   const newName_isAlreadyAdded = (name) => {
     let isAlreadyAdded = false
@@ -67,11 +101,40 @@ const App = (props) => {
     return isAlreadyAdded
   }
 
+
   //--- ----------------------------------------
   const newName_isEmpty = (name) => {
-    let re = /^(\s|\S)*(\S)+(\s|\S)*$/gm // Match everything but NOT BLANK character, at least 1 symbols
+    // Match everything but NOT BLANK character, at least 1 symbols
+    let re = /^(\s|\S)*(\S)+(\s|\S)*$/gm
     // console.log('newName_isEmpty: ', re.test(name))
     return !re.test(name)
+  }
+  
+  
+  //--- ----------------------------------------
+  const handleNewNumber = (ev) => {
+    console.log(ev.target.value)
+    setNewNumber(ev.target.value)
+  }
+  
+  
+  //--- ----------------------------------------
+  const newNumber_reset = () => {
+    setNewNumber('') // RESET it
+  }
+  
+
+  //--- ----------------------------------------
+  const newNumber_isValid = (number) => {
+    // 5-20 numbers
+    // " ", "(", ")", "-" are allowed
+    // Starts from 0-9 or "+"
+    // Ends at 0-9 only
+    // Any mount of " " at the start and the end will be removed by "trim"
+    // Doubled "(", ")", "-" are below
+    let re = /^(\s*[+(])?([\s-()]*?\d){5,20}(\s)*$/m;
+    console.log('newNumber_isValid:', re.test(number.trim()), number)
+    return re.test(number.trim())
   }
 
 
@@ -85,19 +148,29 @@ const App = (props) => {
       <h2>Phonebook</h2>
 
       <form onSubmit={ addName }>
-        <div>Name: <input type        = "text"
-                          placeholder = 'A new name...'
-                          value       = { newName }
-                          onChange    = { handleNewName }/></div>
+
         <div>
-          <button type="submit">Add</button>
+          <span title="Pakollinen kenttä">Name*: </span>
+          <input type        = "text"
+                 placeholder = 'A new name...'
+                 value       = { newName }
+                 onChange    = { handleNewName }/>
         </div>
+        
+        <div>
+          Number: <input type       = "text"
+                         placeholder = '... and number if needed'
+                         value       = { newNumber }
+                         onChange    = { handleNewNumber }/>
+        </div>
+        
+        <div><button type="submit">Add</button></div>
+
       </form>
 
       {/* <div>_DEV_DEBUG: { newName }</div> */}
 
       <h2>Numbers</h2>
-
       <ul>{ persons.map( person => <Person key = { person.id } person = { person } /> ) }</ul>
 
     </div>
