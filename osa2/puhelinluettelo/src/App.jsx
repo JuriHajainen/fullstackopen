@@ -1,6 +1,8 @@
 // import './App.css'
 import { useState } from 'react'
-import Person       from './components/Person'
+import Filter       from './components/Filter'
+import PersonForm   from './components/PersonForm'
+import Persons      from './components/Persons'
 
 
 //--- APP ------------------------------------------------
@@ -8,12 +10,18 @@ import Person       from './components/Person'
 const App = (props) => {
 
 
+  //--- DATA ----------------------------------------
+  
   const [ persons, setPersons ]                = useState(props.persons)
   const [ newName, setNewName ]                = useState('')
   const [ newNumber, setNewNumber ]            = useState('')
   const [ id, setId ]                          = useState(7) // SET "id" to use it for new added persons
   const [ search_keyword, search_keyword_set ] = useState('')
   // const [ search_results, search_results_set ] = useState([])
+
+  const re             = new RegExp(search_keyword, 'i')
+  const search_results = persons.filter( person => re.test(person.name) ) // (search_keyword) ? persons.filter( person => re.test(person.name) ) : []
+  // const notesToShow = showAll ? notes : notes.filter( note => note.important )
 
   const number_validationRules_text = `Number is not valid.
   RULES:
@@ -24,11 +32,13 @@ const App = (props) => {
   • Any mount of " " at the start and the end will be removed by "trim"
   • Doubled "(", ")", "-" are below
   `
-
+  
   // console.log('id:', id)
   // const [ showAll, setShowAll ] = useState(true)
   // console.log( notes.map( note => note.content ) )
   
+  
+  //--- METHODS ----------------------------------------
 
   //--- ----------------------------------------
   const addName = (ev) => {
@@ -119,6 +129,7 @@ const App = (props) => {
     setNewNumber(ev.target.value)
   }
 
+
   //--- ----------------------------------------
   const search_keyword_onChange = (ev) => {
     console.log(ev.target.value)
@@ -126,13 +137,9 @@ const App = (props) => {
     console.log('search_keyword', search_keyword)
     // const re = new RegExp(search_keyword, 'i')
     // search_results_set(persons.filter(person => person.name.match(re)))
-    // console.log('search_results', search_results)
-    
+    // console.log('search_results', search_results) 
   }
-  
-  const re             = new RegExp(search_keyword, 'i')
-  const search_results = persons.filter( person => re.test(person.name) ) // (search_keyword) ? persons.filter( person => re.test(person.name) ) : []
-  
+    
   
   //--- ----------------------------------------
   const newNumber_reset = () => {
@@ -154,9 +161,6 @@ const App = (props) => {
   }
 
 
-  // const notesToShow = showAll ? notes : notes.filter( note => note.important )
-
-
   //--- ------------------------------------
   return (
     <div>
@@ -164,49 +168,22 @@ const App = (props) => {
       <h1>Phonebook</h1>
 
       <hr />
-
-      <h2>Search</h2>
-      <div>
-          Filter shown with: <input type     = "text"
-                                    value    = { search_keyword }
-                                    onChange = { search_keyword_onChange }/>
-      </div>
-      {/* <h4>Results</h4>
-      <ul>{
-        (search_results.length === 0) ?
-        'No results' :
-        search_results.map( result => <Person key = { result.id } person = { result } /> )
-      }</ul> */}
+      
+      <Filter search_keyword          = { search_keyword }
+              search_keyword_onChange = { search_keyword_onChange }/>
       
       <hr />
 
-      <h2>Add new</h2>
-      <form onSubmit={ addName }>
-        <div>
-          <span title="Pakollinen kenttä">Name*: </span>
-          <input type        = "text"
-                 placeholder = 'A new name...'
-                 value       = { newName }
-                 onChange    = { handleNewName }/>
-        </div>      
-        <div>
-          Number: <input type       = "text"
-                         placeholder = '... and number if needed'
-                         value       = { newNumber }
-                         onChange    = { handleNewNumber }/>
-        </div>
-        <div><button type="submit">Add</button></div>
-      </form>
+      <PersonForm addName         = { addName }
+                  newName         = { newName }
+                  handleNewName   = { handleNewName }
+                  newNumber       = { newNumber }
+                  handleNewNumber = { handleNewNumber }/>
 
       {/* <div>_DEV_DEBUG: { newName }</div> */}
 
-      <h4>{(search_keyword) ? 'Search results' : 'All numbers' }</h4>
-      <ul>{
-        (search_results.length === 0) ?
-        'No results' :
-        search_results.map( result => <Person key = { result.id } person = { result } /> )
-      }</ul>
-      {/* <ul>{ persons.map( person => <Person key = { person.id } person = { person } /> ) }</ul> */}
+      <Persons search_keyword = { search_keyword }
+               search_results = { search_results }/>
 
     </div>
   )
