@@ -1,23 +1,35 @@
 // import './App.css'
-import { useState } from 'react'
-import Filter       from './components/Filter'
-import PersonForm   from './components/PersonForm'
-import Persons      from './components/Persons'
+import { useState, useEffect } from 'react'
+import Filter                  from './components/Filter'
+import PersonForm              from './components/PersonForm'
+import Persons                 from './components/Persons'
+import axios                   from 'axios'
 
 
 //--- APP ------------------------------------------------
 
-const App = (props) => {
+const App = () => {
 
 
   //--- DATA ----------------------------------------
   
-  const [ persons, setPersons ]                = useState(props.persons)
+  const [ persons, setPersons ]                = useState([])
   const [ newName, setNewName ]                = useState('')
   const [ newNumber, setNewNumber ]            = useState('')
   const [ id, setId ]                          = useState(7) // SET "id" to use it for new added persons
   const [ search_keyword, search_keyword_set ] = useState('')
   // const [ search_results, search_results_set ] = useState([])
+ 
+  useEffect(() => {
+      console.log('Effect')
+      axios
+        .get('http://localhost:3001/persons')
+        .then(response => {
+          console.log('Promise fullfulled')
+          setPersons(response.data)
+        })
+    }, [])
+  console.log('Render', persons.length, 'persons')
 
   const re             = new RegExp(search_keyword, 'i')
   const search_results = persons.filter( person => re.test(person.name) ) // (search_keyword) ? persons.filter( person => re.test(person.name) ) : []

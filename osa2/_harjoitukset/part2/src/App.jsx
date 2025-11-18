@@ -1,6 +1,7 @@
 // import './App.css'
-import { useState } from 'react'
-import Note         from './components/Note'
+import { useState, useEffect } from 'react'
+import axios                   from 'axios'
+import Note                    from './components/Note'
 
 
 //--- NOTE ------------------------------------------------
@@ -14,13 +15,25 @@ import Note         from './components/Note'
 
 //--- APP ------------------------------------------------
 
-const App = (props) => {
+const App = () => {
 
-  const [ notes, setNotes ]     = useState(props.notes)
+  const [ notes, setNotes ]     = useState([])
   const [ newNote, setNewNote ] = useState('A new note...')
   const [ showAll, setShowAll ] = useState(true)
 
-  // console.log( notes.map( note => note.content ) )
+  const hook = () => {
+    console.log('Effect')
+    axios
+      .get('http://localhost:3001/notes')
+      .then(response => {
+        console.log('Promise fullfulled')
+        setNotes(response.data)
+      })
+  }
+
+  useEffect(hook, [])
+  console.log('Render', notes.length, 'notes')
+  
 
   const addNote = (ev) => {
     ev.preventDefault()
