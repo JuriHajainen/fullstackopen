@@ -7,13 +7,17 @@ import axios from 'axios'
 
 //--- | --------------------------------------------------------------
 
-axios
-  .get('http://localhost:3001/notes')
-  .then(response => {
-    const notes = response.data
-    // console.log(notes)
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />)
-  })
+ReactDOM.createRoot(document.getElementById('root')).render(<App />) // OLD: <App notes = { notes } />
+// const root = ReactDOM.createRoot(document.getElementById('root'))
+
+
+/* axios
+   .get('http://localhost:3001/notes')
+   .then(response => {
+     const notes = response.data
+     // console.log(notes)
+     ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+})*/
 
 
 // const promise2 = axios.get('http://localhost:3001/foobar')
@@ -22,8 +26,6 @@ axios
 
 //--- | --------------------------------------------------------------
 
-// ReactDOM.createRoot(document.getElementById('root')).render(<App notes = { notes } />)
-// const root = ReactDOM.createRoot(document.getElementById('root'))
 
 // const refresh = () => {
     // root.render(<App counter={ counter } />)
