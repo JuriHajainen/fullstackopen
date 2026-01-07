@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react'
 import Filter                  from './components/Filter'
 import PersonForm              from './components/PersonForm'
 import Persons                 from './components/Persons'
-import axios                   from 'axios'
+import requests                from './services/requests'
+// import axios                   from 'axios'
 
 
 //--- APP ------------------------------------------------
@@ -11,7 +12,7 @@ import axios                   from 'axios'
 const App = () => {
 
 
-  //--- DATA ----------------------------------------
+  //--- DATA: "useState" ----------------------------------------
   
   const [ persons, setPersons ]                = useState([])
   const [ newName, setNewName ]                = useState('')
@@ -19,31 +20,37 @@ const App = () => {
   const [ id, setId ]                          = useState(7) // SET "id" to use it for new added persons
   const [ search_keyword, search_keyword_set ] = useState('')
   // const [ search_results, search_results_set ] = useState([])
- 
+
+
+  
+  //--- METHODS: "useEffect" -----------------------------------
   useEffect(() => {
-      console.log('Effect')
-      axios
-        .get('http://localhost:3001/persons')
-        .then(response => {
+      // console.log('Effect')
+      requests
+        .getAll()
+        .then(personsInitial => {
           console.log('Promise fullfulled')
-          setPersons(response.data)
+          setPersons(personsInitial)
+          // console.log('persons: ', persons)
         })
-    }, [])
-  console.log('Render', persons.length, 'persons')
-
-  const re             = new RegExp(search_keyword, 'i')
-  const search_results = persons.filter( person => re.test(person.name) ) // (search_keyword) ? persons.filter( person => re.test(person.name) ) : []
-  // const notesToShow = showAll ? notes : notes.filter( note => note.important )
-
-  const number_validationRules_text = `Number is not valid.
-  RULES:
-  • 5-20 numbers
-  • " ", "(", ")", "-" are allowed
-  • Starts from 0-9 or "+"
-  • Ends at 0-9 only
-  • Any mount of " " at the start and the end will be removed by "trim"
-  • Doubled "(", ")", "-" are below
-  `
+      }, [])
+      // console.log('Render', persons.length, 'persons')
+      
+      
+      //--- DATA: others ----------------------------------------------
+    
+      const re             = new RegExp(search_keyword, 'i')
+      const search_results = ( persons ) ? persons.filter( person => re.test(person.name) ) : [] // (search_keyword) ? persons.filter( person => re.test(person.name) ) : []
+      // const notesToShow = showAll ? notes : notes.filter( note => note.important )
+      const number_validationRules_text = `Number is not valid.
+      RULES:
+      • 5-20 numbers
+      • " ", "(", ")", "-" are allowed
+      • Starts from 0-9 or "+"
+      • Ends at 0-9 only
+      • Any mount of " " at the start and the end will be removed by "trim"
+      • Doubled "(", ")", "-" are below
+      `
   
   // console.log('id:', id)
   // const [ showAll, setShowAll ] = useState(true)
@@ -96,9 +103,14 @@ const App = () => {
      id:     id
     }
 
-    setPersons(persons.concat(personNew))
-    newName_reset() // RESET it
-    newNumber_reset() // RESET it
+    // setPersons(persons.concat(personNew))
+    requests
+      .create(personNew)
+      .then(personNew_returned => {
+        setPersons(persons.concat(personNew_returned))
+        newName_reset() // RESET it
+        newNumber_reset() // RESET it
+      })
 
   }
 

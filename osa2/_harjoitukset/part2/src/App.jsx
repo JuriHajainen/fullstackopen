@@ -1,8 +1,8 @@
 // import './App.css'
 import { useState, useEffect } from 'react'
-import axios                   from 'axios'
 import Note                    from './components/Note'
 import noteService             from './services/notes'
+// import axios                   from 'axios'
 
 
 //--- NOTE ------------------------------------------------
@@ -60,7 +60,6 @@ const App = () => {
         setNotes(notes.concat(returnedNote))
         setNewNote('')
       })
-
   }
 
   //--- --------------------------
@@ -84,6 +83,12 @@ const App = () => {
       .update(id, changedNote)
       .then(returnedNote => {
         setNotes(notes.map(note => note.id !== id ? note : returnedNote))
+      })
+      .catch(error => {
+        alert(
+          `the note '${ note.content }' was already deleted from server`
+        )
+        setNotes(notes.filter(n => n.id !== id))
       })
 
   }
