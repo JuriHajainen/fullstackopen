@@ -17,8 +17,8 @@ const App = () => {
   const [ persons, setPersons ]                = useState([])
   const [ newName, setNewName ]                = useState('')
   const [ newNumber, setNewNumber ]            = useState('')
-  const [ id, setId ]                          = useState(7) // SET "id" to use it for new added persons
   const [ search_keyword, search_keyword_set ] = useState('')
+  // const [ id, setId ]                          = useState('') // SET "id" to use it for new added persons
   // const [ search_results, search_results_set ] = useState([])
 
 
@@ -68,10 +68,6 @@ const App = () => {
       alert('Name field is empty')
     }
     else {
-      if (newName_isAlreadyAdded(newName)) { // Is "newName" already added?
-        alert(`${newName.trim()} is already added to phonebook`)
-      }
-      else {
         if (newNumber.trim()) { // If "newNumber" is not empty
           // console.log('newNumber_isValid(newNumber)', newNumber_isValid(newNumber))
           if (newNumber_isValid(newNumber)) { // Is phone number a valid
@@ -84,7 +80,6 @@ const App = () => {
         else { // if "Number" is empty
           submit_main()
         }
-      }
     }
     
   }
@@ -93,17 +88,17 @@ const App = () => {
   //--- ----------------------------------------
   const submit_main = () => {
 
-    // console.log('id from addName: before setId', id)
-     setId(id + 1)
-    // console.log('id from addName: after setId', id)
-
-    const personNew = {
-     name:   newName.trim(),
-     number: ( newNumber.trim() ) ? newNumber.trim() : '-- no number --',
-     id:     id
+    if (newName_isAlreadyAdded(newName)) { // UPDATE AN EXISTING PERSON
+        submit_update()
     }
+    else { // CREATE A NEW PERSON
 
-    // setPersons(persons.concat(personNew))
+      const personNew = {
+      name:   newName.trim(),
+      number: newNumber.trim(),
+      id:     id_setNew()
+      }
+
     requests
       .create(personNew)
       .then(personNew_returned => {
@@ -112,6 +107,7 @@ const App = () => {
         newNumber_reset() // RESET it
       })
 
+    }
   }
 
 
@@ -183,6 +179,90 @@ const App = () => {
     console.log('newNumber_isValid:', re.test(number.trim()), number)
     return re.test(number.trim())
   }
+  
+
+  //--- ----------------------------------------
+  const submit_update = () => {
+
+    let id = null
+    let number_isEmpty = null
+    let number_isSame = null
+
+    persons.forEach(person => {
+      if (person.name === newName.trim()) {
+        id = person.id
+        number_isEmpty = ( person.number ) ? false : true
+        number_isSame = ( person.number === newNumber.trim() ) ? true : false
+      }
+    });
+        
+    if (number_isSame) {
+      alert(`${newName.trim()} is already added to phonebook with the same number (or number was left empty)`)
+    }
+    else {
+
+      let msg =
+      ( number_isEmpty ) ?
+      `${newName.trim()} is already added to phonebook, do you want add a number to this name?` :
+      `${newName.trim()} is already added to phonebook, replace the old number with a new one?`
+
+      if (window.confirm(msg)) {
+
+      const personUpdate = {
+        name:   newName.trim(),
+        number: newNumber.trim(),
+        id:     id
+    }
+
+    // setPersons(persons.concat(personNew))
+    requests
+      .update(id, personUpdate)
+      .then(returned => {
+        setPersons(prev =>
+          prev.map(p => p.id === returned.id ? returned : p)
+        )
+        newName_reset() // RESET it
+        newNumber_reset() // RESET it
+      })
+    } else {
+      console.log('Update CANCELLED')
+    }
+
+  }
+
+  }
+  
+  
+  //--- ----------------------------------------
+  const person_delete = (id, name) => {
+
+    if (window.confirm(`Delete '${ name }' ?`)) {
+      requests
+      .remove(id)
+      .then(() => {
+        setPersons(prev =>
+        prev.filter(person => person.id !== id)
+        )
+      })
+      .catch(error => {
+        alert(`An error occurred: '${ error }'`)
+      })
+      console.log('DELETED')
+  } else {
+    console.log('CANCELLED')
+  }
+  }
+
+
+  //--- ----------------------------------------
+  const id_setNew = () => {
+
+    const maxId = Math.max(...persons.map(p => Number(p.id)));
+    const nextId = (maxId + 1).toString();
+    // setId(nextId)
+    return nextId
+
+  }
 
 
   //--- ------------------------------------
@@ -207,7 +287,8 @@ const App = () => {
       {/* <div>_DEV_DEBUG: { newName }</div> */}
 
       <Persons search_keyword = { search_keyword }
-               search_results = { search_results }/>
+               search_results = { search_results }
+               person_delete  = { person_delete } />
 
     </div>
   )
